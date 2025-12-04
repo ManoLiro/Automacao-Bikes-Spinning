@@ -1,4 +1,4 @@
-# 🚴‍♂️ Abitah Bikes - Dashboard em Tempo Real
+# 🚴‍♂️ CT Abitah Bikes - Dashboard em Tempo Real
 
 Sistema completo de monitoramento em tempo real para até 20 bicicletas conectadas via FTMS (Fitness Machine Service).
 
@@ -193,7 +193,7 @@ ESP32 (Bikes) → [BLE FTMS] → ESP32 → [HTTP POST] → Backend
 
 ## 📄 Licença
 
-Este projeto foi desenvolvido para Abitah Bikes.
+Este projeto foi desenvolvido para CT Abitah.
 
 ## 👨‍💻 Suporte
 
@@ -202,7 +202,3 @@ Para dúvidas ou problemas:
 2. Verifique se o frontend está conectado ao WebSocket
 3. Confirme que os ESP32 estão enviando dados para a URL correta
 4. Verifique os logs do console para erros
-
----
-
-**Desenvolvido com ❤️ para Abitah Bikes**
