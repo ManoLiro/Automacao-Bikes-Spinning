@@ -5,6 +5,7 @@ from typing import Dict, Any, List
 import asyncio
 import json
 from datetime import datetime
+import time
 
 app = FastAPI(title="Bike Dashboard API")
 
@@ -20,6 +21,9 @@ app.add_middleware(
 # Armazenamento em memória dos dados das bikes
 bike_data: Dict[str, Dict[str, Any]] = {}
 
+# Estado acumulado de cada bike (distância, energia, tempo)
+bike_state: Dict[str, Dict[str, Any]] = {}
+
 # Gerenciamento de conexões WebSocket
 active_connections: List[WebSocket] = []
 
@@ -29,6 +33,29 @@ class BikeReading(BaseModel):
     src: str
     device: str
     reading: Dict[str, Any]
+
+
+def calculate_speed_from_power_and_cadence(power: float, cadence: float) -> float:
+    """
+    Calcula a velocidade (km/h) baseada na potência (W) e cadência (RPM).
+    
+    Fórmula considerando:
+    - Velocidade base da cadência (RPM × fator de conversão)
+    - Ajuste pela potência (maior potência = maior velocidade)
+    - Circunferência típica de roda de bike indoor: ~2.1m
+    - Relação de marcha média: ~3.5
+    """
+    # Velocidade base pela cadência (km/h)
+    speed_from_cadence = cadence * 2.1 * 3.5 * 60 / 1000
+    
+    # Fator de ajuste pela potência
+    power_factor = 0.9 + (power - 80) / (250 - 80) * 0.25
+    power_factor = max(0.8, min(1.2, power_factor))  # Limita entre 0.8 e 1.2
+    
+    # Velocidade final
+    speed = speed_from_cadence * power_factor
+    
+    return round(speed, 1)
 
 
 @app.post("/api/ftms")

@@ -6,10 +6,24 @@ import {
   TrendingUp,
   Route,
   Heart,
-  Clock
+  Clock,
+  Edit2
 } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 const BikeCard = ({ bike }) => {
+  // Estado para edição do nome
+  const [isEditing, setIsEditing] = useState(false)
+  const [customName, setCustomName] = useState('')
+
+  // Carrega nome personalizado do localStorage
+  useEffect(() => {
+    const savedName = localStorage.getItem(`bike_name_${bike.device}`)
+    if (savedName) {
+      setCustomName(savedName)
+    }
+  }, [bike.device])
+
   // Verifica se a bike está ativa (recebeu dados nos últimos 10 segundos)
   const isActive = () => {
     if (!bike.last_update) return false
@@ -19,6 +33,63 @@ const BikeCard = ({ bike }) => {
   }
 
   const active = isActive()
+
+  // Retorna o nome da bike (personalizado ou padrão)
+  const getBikeName = () => {
+    if (customName) return customName
+    
+    if (!bike.device) return 'Bike'
+    
+    // Extrai números do nome do device
+    const numbers = bike.device.match(/\d+/)
+    
+    if (numbers) {
+      return `Bike ${numbers[0]}`
+    }
+    
+    return bike.device
+      .replace(/_/g, ' ')
+      .replace(/([A-Z])/g, ' $1')
+      .trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+  }
+
+  // Salva o nome personalizado
+  const handleSaveName = () => {
+    if (customName.trim()) {
+      localStorage.setItem(`bike_name_${bike.device}`, customName.trim())
+    }
+    setIsEditing(false)
+  }
+
+  // Cancela a edição
+  const handleCancelEdit = () => {
+    const savedName = localStorage.getItem(`bike_name_${bike.device}`)
+    setCustomName(savedName || '')
+    setIsEditing(false)
+  }
+
+  // Gerencia teclas no input
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveName()
+    } else if (e.key === 'Escape') {
+      handleCancelEdit()
+    }
+  }
+
+  // Calcula velocidade aproximada: distância (m) / tempo (s) * 3.6 = km/h
+  const calculateSpeed = () => {
+    if (!bike.total_distance || !bike.elapsed_time || bike.elapsed_time === 0) return null
+    // Distância está em metros, tempo em segundos
+    // Velocidade = (distância / tempo) * 3.6 para converter m/s em km/h
+    const speedMps = bike.total_distance / bike.elapsed_time
+    return speedMps * 3.6
+  }
+
+  const avgSpeed = calculateSpeed()
 
   // Formata valores com fallback
   const formatValue = (value, decimals = 1, unit = '') => {
@@ -37,10 +108,31 @@ const BikeCard = ({ bike }) => {
     <div className={`card-bike ${active ? 'ring-2 ring-primary-500/30' : ''}`}>
       {/* Header do Card */}
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-white truncate">
-            {bike.device || 'Bike'}
-          </h3>
+        <div className="flex-1 min-w-0">
+          {isEditing ? (
+            <input
+              type="text"
+              value={customName}
+              onChange={(e) => setCustomName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleSaveName}
+              className="text-lg font-bold text-white bg-dark-800 border border-primary-500 rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-primary-500"
+              placeholder="Nome da bike"
+              autoFocus
+            />
+          ) : (
+            <div 
+              onClick={() => setIsEditing(true)}
+              className="cursor-pointer group"
+            >
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-white truncate group-hover:text-primary-400 transition-colors">
+                  {getBikeName()}
+                </h3>
+                <Edit2 className="w-3 h-3 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+          )}
           <div className="flex items-center gap-2 mt-1">
             <div className={`w-2 h-2 rounded-full ${active ? 'bg-green-400 animate-pulse' : 'bg-gray-600'}`}></div>
             <span className={`text-xs ${active ? 'text-green-400' : 'text-gray-500'}`}>
@@ -53,11 +145,19 @@ const BikeCard = ({ bike }) => {
 
       {/* Métricas Principais */}
       <div className="grid grid-cols-2 gap-3 mb-3">
-        {/* Velocidade */}
+        {/* Velocidade Instantânea */}
         <MetricBox
           icon={<Gauge className="w-4 h-4" />}
-          label="Velocidade"
+          label="Vel. Inst."
           value={formatValue(bike.instant_speed, 1, ' km/h')}
+          active={active}
+        />
+
+        {/* Velocidade Média Calculada */}
+        <MetricBox
+          icon={<TrendingUp className="w-4 h-4" />}
+          label="Vel. Média"
+          value={formatValue(avgSpeed, 1, ' km/h')}
           active={active}
         />
 
@@ -71,7 +171,7 @@ const BikeCard = ({ bike }) => {
 
         {/* Cadência */}
         <MetricBox
-          icon={<TrendingUp className="w-4 h-4" />}
+          icon={<Activity className="w-4 h-4" />}
           label="Cadência"
           value={formatValue(bike.instant_cadence, 0, ' rpm')}
           active={active}
