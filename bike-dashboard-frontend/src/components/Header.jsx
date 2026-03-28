@@ -1,27 +1,32 @@
-import { Activity, Wifi, WifiOff, UserPlus, RotateCcw } from 'lucide-react'
+import { Wifi, WifiOff, UserPlus, RotateCcw, Trash2 } from 'lucide-react'
+import logo from '../public/logo.png'
 
-const Header = ({ totalBikes, activeBikes, isConnected, onOpenStudentModal, onResetAssignments }) => {
+const Header = ({ totalBikes, activeBikes, isConnected, onOpenStudentModal, onResetAssignments, onDeleteAllBikes }) => {
   const handleReset = () => {
     if (confirm('Deseja realmente desvincular todos os alunos das bikes?\nIsso é útil ao trocar de turma.')) {
       onResetAssignments?.()
     }
   }
 
+  const handleDeleteBikes = () => {
+    if (confirm('Deseja realmente deletar TODAS as bikes do sistema?\n\nIsso irá remover todas as bikes e seus vínculos.\nOs alunos cadastrados serão mantidos.')) {
+      onDeleteAllBikes?.()
+    }
+  }
+
   return (
-    <header className="bg-dark-900/80 backdrop-blur-md border-b border-dark-700 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+    <header className="bg-dark-900/95 backdrop-blur-md border-b border-primary-500/20 sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo, Título e Botões */}
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="Abitah" className="w-12 h-12 object-contain" />
               <div>
-                <h1 className="text-2xl font-bold text-white">
-                  Abitah <span className="text-primary-500">Bikes</span>
+                <h1 className="text-2xl font-bold text-white tracking-wide">
+                  ABITAH <span className="text-primary-400">SPINNING</span>
                 </h1>
-                <p className="text-xs text-gray-400">Dashboard em Tempo Real</p>
+                <p className="text-xs text-primary-500/70 font-semibold tracking-widest uppercase">Ranking em Tempo Real</p>
               </div>
             </div>
 
@@ -37,11 +42,19 @@ const Header = ({ totalBikes, activeBikes, isConnected, onOpenStudentModal, onRe
               </button>
               <button
                 onClick={handleReset}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-dark-800 border border-dark-700 hover:border-red-500/50 hover:bg-dark-700 transition-all text-sm"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-dark-800 border border-dark-700 hover:border-yellow-500/50 hover:bg-dark-700 transition-all text-sm"
                 title="Resetar todos os vínculos (trocar turma)"
               >
-                <RotateCcw className="w-4 h-4 text-red-400" />
+                <RotateCcw className="w-4 h-4 text-yellow-400" />
                 <span className="text-gray-300 hidden sm:inline">Resetar Vínculos</span>
+              </button>
+              <button
+                onClick={handleDeleteBikes}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-dark-800 border border-dark-700 hover:border-red-500/50 hover:bg-dark-700 transition-all text-sm"
+                title="Deletar todas as bikes do sistema"
+              >
+                <Trash2 className="w-4 h-4 text-red-400" />
+                <span className="text-gray-300 hidden sm:inline">Deletar Bikes</span>
               </button>
             </div>
           </div>
@@ -49,10 +62,10 @@ const Header = ({ totalBikes, activeBikes, isConnected, onOpenStudentModal, onRe
           {/* Status e Métricas */}
           <div className="flex items-center gap-6">
             <div className="text-right">
-              <div className="text-2xl font-bold text-primary-400">
-                {activeBikes}/{totalBikes}
+              <div className="text-3xl font-extrabold text-primary-400">
+                {activeBikes}<span className="text-gray-500">/</span>{totalBikes}
               </div>
-              <div className="text-xs text-gray-400">Bikes Ativas</div>
+              <div className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Bikes Ativas</div>
             </div>
 
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-dark-800 border border-dark-700">

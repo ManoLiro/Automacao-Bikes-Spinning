@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900;
+    @apply bg-dark-900;
     @apply text-gray-100;
     @apply min-h-screen;
     @apply font-sans;
@@ -12,24 +12,156 @@
 }
 
 @layer components {
-  .card-bike {
-    @apply bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-4 shadow-lg;
-    @apply transition-all duration-300 hover:shadow-primary-500/20 hover:border-primary-500/50;
+  /* Ranking list styles */
+  .ranking-row {
+    @apply flex items-center px-6 py-4 border-b border-dark-700/40 transition-all duration-500;
   }
-  
-  .metric-value {
-    @apply text-2xl font-bold text-primary-400;
+
+  .ranking-row:hover {
+    @apply bg-primary-500/5;
   }
-  
-  .metric-label {
-    @apply text-xs text-gray-400 uppercase tracking-wider;
+
+  .ranking-row-unassigned {
+    @apply opacity-40;
   }
-  
+
+  .ranking-position {
+    @apply text-4xl font-black w-20 text-center shrink-0;
+  }
+
+  .ranking-student-name {
+    @apply text-3xl font-extrabold text-white leading-tight;
+  }
+
+  .ranking-bike-name {
+    @apply text-base text-gray-400;
+  }
+
+  .ranking-metric {
+    @apply text-center px-4 min-w-[100px];
+  }
+
+  .ranking-metric-value {
+    @apply text-3xl font-extrabold text-primary-400;
+  }
+
+  .ranking-metric-label {
+    @apply text-sm text-gray-500 uppercase tracking-wider font-semibold;
+  }
+
+  /* Distance (main metric) */
+  .ranking-metric-distance .ranking-metric-value {
+    @apply text-4xl text-primary-300;
+  }
+
+  /* Top 3 medals */
+  .ranking-gold {
+    @apply bg-yellow-500/10 border-l-[6px] border-yellow-400;
+  }
+
+  .ranking-silver {
+    @apply bg-gray-300/5 border-l-[6px] border-gray-400;
+  }
+
+  .ranking-bronze {
+    @apply bg-amber-700/10 border-l-[6px] border-amber-600;
+  }
+
   .status-active {
     @apply text-green-400 animate-pulse-slow;
   }
-  
+
   .status-inactive {
     @apply text-gray-500;
   }
+}
+
+/* === GAMIFICATION ANIMATIONS === */
+
+@keyframes fire-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px #f97316, 0 0 10px #fb923c, 0 0 15px #ef4444;
+  }
+  50% { 
+    box-shadow: 0 0 10px #f97316, 0 0 20px #fb923c, 0 0 30px #ef4444;
+  }
+}
+
+.zone-fire {
+  animation: fire-pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes lightning {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.sprint-active {
+  animation: lightning 0.3s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.countdown-number {
+  animation: countdown-pulse 1s ease-in-out infinite;
+}
+
+@keyframes celebrate {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-3deg); }
+  50% { transform: scale(1.2) rotate(0deg); }
+  75% { transform: scale(1.1) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.personal-record {
+  animation: celebrate 0.6s ease-out;
+}
+
+.badge-celebration {
+  animation: celebrate 0.6s ease-out;
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.progress-animated {
+  background: linear-gradient(90deg, #eab308, #f97316, #ef4444, #f97316, #eab308);
+  background-size: 200% 100%;
+  animation: gradient-flow 2s ease infinite;
+}
+
+/* Confetti animation for personal records */
+@keyframes confetti-fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x-offset), 80px) rotate(720deg) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Toast slide-in animation */
+@keyframes toast-slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 0.4s ease-out forwards;
 }
